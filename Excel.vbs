@@ -102,10 +102,12 @@ Class Excel
             Exit Sub
         End If
 
+
         If IsNull(destination) Or destination = "" Then
-            destination = objFSO.GetBaseName(GetActiveWorkbook.Name)
+            EchoX "Destination directory not provided. Will be uploaded to default direcotry %x", GetActiveWorkbook.Name
+            destination = putil.Resolve(GetActiveWorkbook.Name)
+            destination = objFSO.GetBaseName(destination)
             destination = objFSO.BuildPath(putil.BasePath, destination)
-            EchoX "Destination directory not provided. Will be uploaded to default direcotry %x", destination
             If cFS.CreateFolder(destination) Then
                 EchoX "Destination Directory successfully created at: %x", destination
             Else

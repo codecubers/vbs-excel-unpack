@@ -50,7 +50,7 @@ Public Function argsDict()
         If startsWith(param, "/") And contains(param, ":") Then
             param = mid(param, 2)
             WScript.Echo "param to be split: " & param
-            dict.Add split(param, ":")(0), split(param, ":")(1)
+            dict.Add Lcase(split(param, ":")(0)), split(param, ":")(1)
         Else
             dict.Add i, param
         End If
@@ -686,10 +686,12 @@ Class Excel
             Exit Sub
         End If
 
+
         If IsNull(destination) Or destination = "" Then
-            destination = objFSO.GetBaseName(GetActiveWorkbook.Name)
+            EchoX "Destination directory not provided. Will be uploaded to default direcotry %x", GetActiveWorkbook.Name
+            destination = putil.Resolve(GetActiveWorkbook.Name)
+            destination = objFSO.GetBaseName(destination)
             destination = objFSO.BuildPath(putil.BasePath, destination)
-            EchoX "Destination directory not provided. Will be uploaded to default direcotry %x", destination
             If cFS.CreateFolder(destination) Then
                 EchoX "Destination Directory successfully created at: %x", destination
             Else
@@ -820,14 +822,25 @@ End Class ' Excel
 
 
 '================= File: C:\Users\nanda\git\xps.local.npm\vbs-excel-utilities\lib\parameters.vbs =================
-set dutil = new DictUtil
-set d = argsDict
-call dutil.SortDictionary(d, 1)
-EchoX "Parameter Keys: %x", join(d.Keys, ",")
-EchoX "Parameter Items: %x", join(d.Items, ",")
-call dutil.SortDictionary(d, 2)
-EchoX "Parameter Keys: %x", join(d.Keys, ",")
-EchoX "Parameter Items: %x", join(d.Items, ",")
+' Dim dutil, d, col, wbFile
+' set dutil = new DictUtil
+' set d = argsDict
+
+'Sort by keys (named arguments or index)
+' call dutil.SortDictionary(d, 1)
+' EchoX "Parameter Keys: %x", join(d.Keys, "|| ")
+' EchoX "Parameter Items: %x", join(d.Items, "|| ")
+
+' set col = new Collection
+' set col.Obj = d
+Dim wbFile
+If Wscript.Arguments.Named.Exists("workbook") Then
+    wbFile = Wscript.Arguments.Named("workbook")
+    EchoX "Excel workbook to be unpacked: %x", wbFile
+Else
+    Echo "No excel workbook supplied as a parameter. Nothing to unpack."
+    WScript.Quit
+End If
 
 
 '================= File: C:\Users\nanda\git\xps.local.npm\vbs-excel-utilities\lib\export.vbs =================
@@ -835,7 +848,8 @@ Include(".\parameters.vbs")
 Include("..\Excel.vbs")
 Dim xl
 set xl = new Excel
-xl.OpenWorkBook("..\test\Excel_MVC_Creator.xlsm")
+EchoX "Opening workbook at path: %x", wbFile
+xl.OpenWorkBook(wbFile)
 EchoX "Active workbook name is: %x", xl.GetActiveWorkbook.Name
 xl.ExportVBAComponents(NULL)
 xl.CloseWorkBook

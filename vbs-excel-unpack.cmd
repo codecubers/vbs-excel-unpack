@@ -1,0 +1,1 @@
+cscript //nologo  %dp0%\..\vbs-excel-utilities\build\export-bundle.vbs %*
