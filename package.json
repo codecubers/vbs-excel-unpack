@@ -1,0 +1,24 @@
+{
+  "name": "vbs-excel-utilities",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "directories": {
+    "test": "test"
+  },
+  "bin": {
+    "xlunpack": "build\\export-bundle.vbs",
+    "xlpack": "build\\import-bundle.vbs"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "vbspm": "^1.2.5"
+  },
+  "scripts": {
+    "test": "npx vbspm test\\test.vbs && test\\test.cmd",
+    "build" : "npx vbspm lib\\import.vbs && npx vbspm lib\\export.vbs"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
