@@ -106,14 +106,15 @@ Class Excel
         If IsNull(destination) Or destination = "" Then
             EchoX "Destination directory not provided. Will be uploaded to default direcotry %x", GetActiveWorkbook.Name
             destination = putil.Resolve(GetActiveWorkbook.Name)
-            destination = objFSO.GetBaseName(destination)
-            destination = objFSO.BuildPath(putil.BasePath, destination)
-            If cFS.CreateFolder(destination) Then
-                EchoX "Destination Directory successfully created at: %x", destination
-            Else
-                EchoX "Unable to create destination directory at [%x]. Please create it and retry.", destination
-                Exit Sub
-            End If
+        End If
+
+        destination = objFSO.GetBaseName(destination)
+        destination = objFSO.BuildPath(putil.BasePath, destination)
+        If cFS.CreateFolder(destination) Then
+            EchoX "Destination Directory successfully created at: %x", destination
+        Else
+            EchoX "Unable to create destination directory at [%x]. Please create it and retry.", destination
+            Exit Sub
         End If
 
         If Not objFSO.FolderExists(destination) Then
@@ -164,6 +165,7 @@ Class Excel
             
             End If
         Next 
+        Echo "Unpacking completed succesfully."
     End Sub
 
     Public Sub ImportVBAComponents(source)
@@ -200,6 +202,7 @@ Class Excel
         Next 
 
         wkbSource.save
+        Echo "Packing completed succesfully."
     End Sub
 
     Public Sub DeleteVBAComponents(save)

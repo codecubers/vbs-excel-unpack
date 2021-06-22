@@ -2,8 +2,9 @@ Include(".\parameters.vbs")
 Include("..\Excel.vbs")
 Dim xl
 set xl = new Excel
-xl.OpenWorkBook("..\test\Excel_MVC_Creator.xlsm")
+EchoX "Opening workbook at path: %x", wbFile
+xl.OpenWorkBook(wbFile)
 EchoX "Active workbook name is: %x", xl.GetActiveWorkbook.Name
-xl.ImportVBAComponents(NULL)
+xl.ImportVBAComponents(sourceDir)
 xl.CloseWorkBook
 set xl = nothing

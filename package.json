@@ -1,6 +1,6 @@
 {
   "name": "vbs-excel-utilities",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Excel Unpacker and other excel utilities written in Vbscript  ",
   "main": "index.js",
   "directories": {
@@ -8,7 +8,7 @@
   },
   "bin": {
     "xlunpack": "vbs-excel-unpack.cmd",
-    "xlpack": "build\\import-bundle.vbs"
+    "xlpack": "vbs-excel-pack.cmd"
   },
   "dependencies": {},
   "devDependencies": {
@@ -16,7 +16,7 @@
   },
   "scripts": {
     "test": "npx vbspm test\\test.vbs && test\\test.cmd",
-    "build": "npx vbspm lib\\import.vbs && npx vbspm /file:lib\\export.vbs /workbook:test\\Excel_MVC_Creator.xlsm"
+    "build": "npx vbspm /file:lib\\export.vbs /workbook:test\\Excel_MVC_Creator.xlsm /destination:Excel_MVC_Creator && npx vbspm /file:lib\\import.vbs /workbook:test\\Excel_MVC_Creator.xlsm /source:Excel_MVC_Creator"
   },
   "keywords": [],
   "author": "Praveen Kumar Nandagiri <pravynandas@gmail.com>",
