@@ -1,7 +1,7 @@
 {
   "name": "vbs-excel-utilities",
   "version": "1.0.0",
-  "description": "",
+  "description": "Excel Unpacker and other excel utilities written in Vbscript  ",
   "main": "index.js",
   "directories": {
     "test": "test"
@@ -19,6 +19,6 @@
     "build" : "npx vbspm lib\\import.vbs && npx vbspm lib\\export.vbs"
   },
   "keywords": [],
-  "author": "",
+  "author": "Praveen Kumar Nandagiri <pravynandas@gmail.com>",
   "license": "ISC"
 }
