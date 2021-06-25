@@ -9,7 +9,7 @@
 
 ' set col = new Collection
 ' set col.Obj = d
-Dim wbFile, sourceDir, destDir
+Dim wbFile, sourceDir, destDir, data
 If Wscript.Arguments.Named.Exists("workbook") Then
     wbFile = Wscript.Arguments.Named("workbook")
     EchoX "Excel workbook to be packed/unpacked: %x", wbFile
@@ -27,3 +27,9 @@ If Wscript.Arguments.Named.Exists("destination") Then
     destDir = Wscript.Arguments.Named("destination")
     EchoX "Excel workbook will be unpacked to directory: %x", destDir
 End If
+
+If Wscript.Arguments.Named.Exists("data") Then
+    data = Wscript.Arguments.Named("data")
+    EchoX "Data received: %x", data
+End If
+

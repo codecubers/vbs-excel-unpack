@@ -152,6 +152,138 @@ End Sub
 Public Sub EchoD(str) 
     EchoDX str, NULL
 End Sub
+' ================= src : lib/core/Collection/Collection.vbs ================= 
+
+
+Class Collection
+
+    Private dict
+    Private oThis
+    Private m_Name
+
+    Private Sub Class_Initialize()
+        set dict = CreateObject("Scripting.Dictionary")
+        set oThis = Me
+        m_Name = "Undefined"
+    End Sub
+
+    Public Default Property Get Obj
+        set Obj = dict
+    End Property 
+    Public Property Set Obj(d)
+        set dict = d
+    End Property 
+
+    Public Property Get Name
+        Name = m_Name
+    End Property
+    Public Property Let Name(Value)
+        m_Name = Value
+    End Property
+
+    Public Sub Add(Key, Value)
+        dict.Add key, value
+    End Sub ' Add
+
+    Public Sub Remove(Key)
+        If KeyExists(Key) Then
+            dict.Remove(Key)
+        Else
+            RaiseErr "Key [" & Key & "] does not exists in collection."
+        End If
+    End Sub ' Remove
+
+    Public Sub RemoveAll()
+        dict.RemoveAll()
+    End Sub
+
+    Public Property Get Count
+        Count = dict.Count
+    End Property
+
+    Public Function GetItem(Key)
+        If KeyExists(Key) Then
+            GetItem = dict.Item(Key)
+        Else
+            'TODO: Should we raise an error?
+            RaiseErr "Key [" & Key & "] does not exists in collection."
+        End If
+    End Function ' GetItem
+
+    Public Function GetItemAtIndex(Index)
+        'TODO: How to ensure Index is an integer?
+        GetItemAtIndex = dict.Item(Index)
+    End Function ' GetItemAtIndex
+
+
+    Public Function IndexOf(Key)
+        IndexOf = dict.IndexOf(Key, 0)
+    End Function
+
+    Public Function KeyExists(Key)
+        KeyExists = dict.Exists(Key)
+    End Function
+
+    Public Function toCSV
+        toCSV = join(toArray(), ", ")
+    End Function
+
+    Public Function toArray
+        toArray = dict.Items
+    End Function
+
+    Public Function isEmpty
+        isEmpty = (dict.Count = 0)        
+    End Function ' isEmpty
+    
+    ' Public Sub ReverseKeys
+
+    '     Dim i, j, last, half, temp, arr
+    '     arr = dict.Keys
+    '     WScript.Echo join(arr, ", ")
+    '     last = UBound(arr)
+    '     half = Int(last/2)
+
+    '     For i = 0 To half
+    '         temp = arr(i)
+    '         arr(i) = arr(last-i)
+    '         arr(last-i) = temp
+    '     Next
+        
+    '     WScript.Echo join(arr, ", ")
+
+    '     dim dict1
+    '     set dict1 = New Collection
+    '     for i = 0 to UBound(arr)
+    '         dict1.Add arr(i), arr(i) & "1"
+    '     next
+    '     'WScript.Echo dict1.toCSV
+    '     ' RemoveAll
+    '     set dict = dict1
+
+    ' End Sub
+
+    ' list.Sort (available in DictUtil)
+    ' list.Reverse
+        ' for each k in dict.Keys
+        '     if k = Key Then
+        '         KeyExists = true
+        '         Exit Function
+        '     End If
+        ' next
+
+
+    Private Sub RaiseErr(desc)
+        Err.Clear
+        Err.Raise 1000, "Collection Class Error", desc
+    End Sub
+
+    Private Sub Class_Terminate()
+        set dict = Nothing
+        set oThis = Nothing
+    End Sub
+
+End Class ' Collection
 ' ================= src : lib/core/DictUtil.vbs ================= 
 Class DictUtil
     
@@ -581,7 +713,7 @@ Public Sub Import(file)
 End Sub
 
 
-'================= File: C:\Users\nanda\git\xps.local.npm\vbs-excel-utilities\Excel.vbs =================
+'================= File: C:\Users\nanda\git\xps.local.npm\vbs-excel-unpack\Excel.vbs =================
 Class Excel
 
     Private Property Get vbext_ct_Document
@@ -810,6 +942,47 @@ Class Excel
         if(save) Then wkbSource.save
     End Sub
 
+    Public Sub SimpleXYPlot(data, destination)
+    
+        If IsNull(destination) Or destination = "" Then
+            EchoX "Destination directory not provided. Will be uploaded to default direcotry %x", GetActiveWorkbook.Name
+            destination = putil.Resolve(GetActiveWorkbook.Name)
+        End If
+
+        destination = objFSO.GetBaseName(destination)
+        destination = objFSO.BuildPath(putil.BasePath, destination)
+        If cFS.CreateFolder(destination) Then
+            EchoX "Destination Directory successfully created at: %x", destination
+        Else
+            EchoX "Unable to create destination directory at [%x]. Please create it and retry.", destination
+            Exit Sub
+        End If
+        destination = objFSO.BuildPath(destination, "SimpleXYPlot.png")
+
+        dim arr
+        arr = split(data, ",")
+        with Application.ActiveWorkbook.worksheets(1)
+            .usedrange.clear
+            .Range("A2").value = arr(0)
+            .Range("B2").value = arr(1)
+            .Range("A2").value = arr(2)
+            .Range("B2").value = arr(3)
+            .Range("A3").value = arr(4)
+            .Range("B3").value = arr(5)
+            .Range("A4").value = arr(6)
+            .Range("B4").value = arr(7)
+        end with
+        Application.Run "'" & ActiveWorkbook.Name & "'!PlotTheChart", "SimpleXY", destination, "Dark"  
+    End Sub
+
+    Public Sub RunModuleMacro(macro) 
+        Application.Run "'" & ActiveWorkbook.Name & "'!" & macro 
+    End Sub
+
+    Public Sub RunSheetMacro(sheet, macro)
+        Application.Run "'" & ActiveWorkbook.Name & "'!'" & sheet & "'." & macro
+    End Sub
+
     Private Sub Class_Terminate()
         EchoD "Excel Class being terminated."
         On Error Resume Next
@@ -824,7 +997,7 @@ Class Excel
 End Class ' Excel
 
 
-'================= File: C:\Users\nanda\git\xps.local.npm\vbs-excel-utilities\lib\parameters.vbs =================
+'================= File: C:\Users\nanda\git\xps.local.npm\vbs-excel-unpack\lib\parameters.vbs =================
 ' Dim dutil, d, col, wbFile
 ' set dutil = new DictUtil
 ' set d = argsDict
@@ -836,7 +1009,7 @@ End Class ' Excel
 
 ' set col = new Collection
 ' set col.Obj = d
-Dim wbFile, sourceDir, destDir
+Dim wbFile, sourceDir, destDir, data
 If Wscript.Arguments.Named.Exists("workbook") Then
     wbFile = Wscript.Arguments.Named("workbook")
     EchoX "Excel workbook to be packed/unpacked: %x", wbFile
@@ -855,8 +1028,15 @@ If Wscript.Arguments.Named.Exists("destination") Then
     EchoX "Excel workbook will be unpacked to directory: %x", destDir
 End If
 
+If Wscript.Arguments.Named.Exists("data") Then
+    data = Wscript.Arguments.Named("data")
+    EchoX "Data received: %x", data
+End If
 
-'================= File: C:\Users\nanda\git\xps.local.npm\vbs-excel-utilities\lib\export.vbs =================
+
+
+
+'================= File: C:\Users\nanda\git\xps.local.npm\vbs-excel-unpack\lib\export.vbs =================
 Include(".\parameters.vbs")
 Include("..\Excel.vbs")
 Dim xl
