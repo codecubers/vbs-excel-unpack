@@ -946,11 +946,11 @@ End Class
     End Function
 
     Public Property Get GetActiveWorkbook
-        GetActiveWorkbook = m_EXCEL.GetActiveWorkbook
+        set GetActiveWorkbook = m_EXCEL.GetActiveWorkbook
     End Property
 
     Public Property Get GetApplication
-        GetApplication = m_EXCEL.GetApplication
+        set GetApplication = m_EXCEL.GetApplication
     End Property
 
     Public Sub SimpleXYPlot(data, destination)
