@@ -48,7 +48,7 @@ Public Function argsDict()
         End If
     Next
     set argsDict = dict
-End Function		
+End Function	
 
 Class Console
 
@@ -127,7 +127,7 @@ End Sub
 
 Public Sub EchoD(str) 
     EchoDX str, NULL
-End Sub		
+End Sub	
 
 Class Collection
 
@@ -221,7 +221,7 @@ Class Collection
 
 End Class
 
-	
+
 
 	Class DictUtil
 
@@ -271,7 +271,7 @@ End Class
     End Function
 End Class
 
-	
+
 
 	Class ArrayUtil
 
@@ -315,7 +315,7 @@ End Class
 
 
 Dim arrUtil
-set arrUtil = new ArrayUtil		
+set arrUtil = new ArrayUtil	
 
 Class PathUtil
 
@@ -467,7 +467,7 @@ End Class
 Dim putil
 set putil = new PathUtil
 putil.BasePath = baseDir
-EchoX "Project location: %x", putil.BasePath		
+EchoX "Project location: %x", putil.BasePath	
 
 Class FSO
 	Private dir
@@ -607,7 +607,7 @@ Public Function log(msg)
 cFS.WriteFile "build.log", msg, false
 End Function
 
-log "VBSPM Directory: " & vbspmDir		
+log "VBSPM Directory: " & vbspmDir	
 
 Class ClassA
     public default sub CallMe
@@ -615,7 +615,7 @@ Class ClassA
     End Sub
 End Class
 
-	
+
 
 	Class ClassB
 
@@ -633,7 +633,7 @@ End Class
 
 
 Dim ccb 
-set ccb = new	 ClassB
+set ccb = new ClassB
 ccb.CallMe
 
 Public Sub Include(file)
@@ -643,6 +643,8 @@ Public Sub Import(file)
 
 End Sub
 
+
+'================= File: C:\Users\nanda\git\xps.local.npm\vbs-excel-unpack\Excel.vbs =================
 Class Excel
 
     Private Property Get vbext_ct_Document
@@ -719,7 +721,7 @@ Class Excel
             Err.Clear
             Err.Raise 50002, "Error in Excel Class", "Unable to open Excel Workbook at path " & path
         end if
-
+        ''' NOTE: This workbook must be open in Excel.
         Set wkbSource = Application.Workbooks(ActiveWorkbook.Name)
         EchoX "Workbook %x opened successfully.", wkbSource.Name
     End Sub
@@ -751,6 +753,7 @@ Class Excel
             Exit Sub
         End If
 
+
         If IsNull(destination) Or destination = "" Then
             EchoX "Destination directory not provided. Will be uploaded to default direcotry %x", GetActiveWorkbook.Name
             destination = putil.Resolve(GetActiveWorkbook.Name)
@@ -771,6 +774,7 @@ Class Excel
         End If
         destination = ObjFSO.GetFolder(destination)
 
+        'TODO: Move objFSO code to it's own class
         On Error Resume Next
         EchoX "Deleting previously exported VBA Modules in direcotry %x", destination
         objFSO.DeleteFile objFSO.BuildPath(destination, "*.cls"), True
@@ -778,13 +782,14 @@ Class Excel
         objFSO.DeleteFile  objFSO.BuildPath(destination, "*.bas"), True
         objFSO.DeleteFile  objFSO.BuildPath(destination, "*.frx"), True
         On Error GoTo 0
-
+        
         EchoX "Exporting VBComponents to folder: %x", destination
         For Each cmpComponent In wkbSource.VBProject.VBComponents
-
+            
             bExport = True
             szFileName = cmpComponent.Name
 
+            ''' Concatenate the correct filename for export.
             Select Case cmpComponent.Type
                 Case vbext_ct_ClassModule
                     szFileName = szFileName & ".cls"
@@ -793,14 +798,22 @@ Class Excel
                 Case vbext_ct_StdModule
                     szFileName = szFileName & ".bas"
                 Case vbext_ct_Document
-
+                    ''' This is a worksheet or workbook object.
+                    ''' Don't try to export.
                     bExport = False
             End Select
-
+            
             If bExport Then
-
+                ''' Export the component to a text file.
+                'EchoX "Exporting Module %x to %x", Array(szFileName, objFSO.BuildPath(destination, szFileName))
+                'On Error Resume Next
                 cmpComponent.Export objFSO.BuildPath(destination, szFileName)
-
+                'Echo Err.Description
+                'On Error Goto 0
+                
+            ''' remove it from the project if you want
+            '''wkbSource.VBProject.VBComponents.Remove cmpComponent
+            
             End If
         Next 
         Echo "Unpacking completed succesfully."
@@ -808,7 +821,7 @@ Class Excel
 
     Public Sub ImportVBAComponents(source)
         Dim cmpComponents, objFile
-
+        
         If IsNull(source) Or source = "" Then
             source = objFSO.GetBaseName(GetActiveWorkbook.Name)
             source = objFSO.BuildPath(putil.BasePath, source)
@@ -827,6 +840,8 @@ Class Excel
 
         Set cmpComponents = wkbSource.VBProject.VBComponents
 
+        ''' Import all the code modules in the specified path
+        ''' to the wkbSource.
         DeleteVBAComponents False
 
         For Each objFile In objFSO.GetFolder(source).Files
@@ -835,14 +850,14 @@ Class Excel
                 (objFSO.GetExtensionName(objFile.Name) = "bas") Then
                 cmpComponents.Import objFile.Path
             End If
-        Next
+        Next 
 
         wkbSource.save
         Echo "Packing completed succesfully."
     End Sub
 
     Public Sub DeleteVBAComponents(save)
-        Dim VBComponents, VBComp
+        Dim VBComponents, VBComp 
 
         If isProtected Then
             Echo "The workbook is protected. Cannot delete VB Components."
@@ -853,7 +868,8 @@ Class Excel
         Set VBComponents = wkbSource.VBProject.VBComponents
         For Each VBComp In VBComponents
             If VBComp.Type = vbext_ct_Document Then
-
+                'Thisworkbook or worksheet module
+                'We do nothing
             Else
                 VBComponents.Remove VBComp
             End If
@@ -880,81 +896,18 @@ Class Excel
         On Error Goto 0
     End Sub
 
-End Class
+End Class ' Excel
 
-
-
-	Class ExcelPlotter
+Class ExcelPlotter extends Excel
 
     Private objFSO
 
-    Private m_EXCEL
-
     Private Sub Class_Initialize()
-        set m_EXCEL = new EXCEL
-
         Set objFSO = CreateObject("scripting.filesystemobject")
-
     End Sub
-
-    Public Sub Include(file)
-        call m_EXCEL.Include(file)
-    End Sub
-
-    Public Sub Import(file)
-        call m_EXCEL.Import(file)
-    End Sub
-
-    Public Sub OpenWorkBook(path)
-        call m_EXCEL.OpenWorkBook(path)
-    End Sub
-
-    Public SUb CloseWorkBook
-        call m_EXCEL.CloseWorkBook
-    End Sub
-
-    Public Sub SetVisibility(flag)
-        call m_EXCEL.SetVisibility(flag)
-    End Sub
-
-    Public Sub ShowAlerts(flag)
-        call m_EXCEL.ShowAlerts(flag)
-    End Sub
-
-    Public Sub ExportVBAComponents(destination)
-        call m_EXCEL.ExportVBAComponents(destination)
-    End Sub
-
-    Public Sub ImportVBAComponents(source)
-        call m_EXCEL.ImportVBAComponents(source)
-    End Sub
-
-    Public Sub DeleteVBAComponents(save)
-        call m_EXCEL.DeleteVBAComponents(save)
-    End Sub
-
-    Public Sub RunModuleMacro(macro)
-        call m_EXCEL.RunModuleMacro(macro)
-    End Sub
-
-    Public Sub RunSheetMacro(sheet, macro)
-        call m_EXCEL.RunSheetMacro(sheet, macro)
-    End Sub
-
-    Public Function isProtected
-        isProtected = m_EXCEL.isProtected
-    End Function
-
-    Public Property Get GetActiveWorkbook
-        GetActiveWorkbook = m_EXCEL.GetActiveWorkbook
-    End Property
-
-    Public Property Get GetApplication
-        GetApplication = m_EXCEL.GetApplication
-    End Property
-
+    
     Public Sub SimpleXYPlot(data, destination)
-
+    
         If IsNull(destination) Or destination = "" Then
             EchoX "Destination directory not provided. Will be uploaded to default direcotry %x", GetActiveWorkbook.Name
             destination = putil.Resolve(GetActiveWorkbook.Name)
@@ -989,7 +942,18 @@ End Class
 End Class
 
 
+'================= File: C:\Users\nanda\git\xps.local.npm\vbs-excel-unpack\lib\parameters.vbs =================
+' Dim dutil, d, col, wbFile
+' set dutil = new DictUtil
+' set d = argsDict
 
+'Sort by keys (named arguments or index)
+' call dutil.SortDictionary(d, 1)
+' EchoX "Parameter Keys: %x", join(d.Keys, "|| ")
+' EchoX "Parameter Items: %x", join(d.Items, "|| ")
+
+' set col = new Collection
+' set col.Obj = d
 Dim wbFile, sourceDir, destDir, data
 If Wscript.Arguments.Named.Exists("workbook") Then
     wbFile = Wscript.Arguments.Named("workbook")
@@ -1014,6 +978,10 @@ If Wscript.Arguments.Named.Exists("data") Then
     EchoX "Data received: %x", data
 End If
 
+
+
+
+'================= File: C:\Users\nanda\git\xps.local.npm\vbs-excel-unpack\lib\export.vbs =================
 Include(".\parameters.vbs")
 Include("..\Excel.vbs")
 Dim xl

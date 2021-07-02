@@ -1,7 +1,7 @@
 Include(".\parameters.vbs")
 Include("..\Excel.vbs")
 Dim xl
-set xl = new Excel
+set xl = new ExcelPlotter
 putil.TempBasePath = "."
 wbFile = "..\workbooks\SimpleXYPlot.xlsm"
 EchoX "Opening workbook at path: %x", wbFile

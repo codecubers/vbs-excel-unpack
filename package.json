@@ -1,6 +1,6 @@
 {
   "name": "vbs-excel-utilities",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "Excel Unpacker and other excel utilities written in Vbscript  ",
   "main": "index.js",
   "directories": {
@@ -11,10 +11,13 @@
     "xlpack": "vbs-excel-pack.cmd",
     "xlplotXY": "vbs-excel-plot-simple-xy.cmd"
   },
-  "dependencies": {},
-  "devDependencies": {
-    "vbspm": "file:../vbspm"
+  "publishConfig": {
+    "registry": "https://nodevbs-wvq5k.ondigitalocean.app/"
   },
+  "dependencies": {
+    "vbspm": "^1.2.8"
+  },
+  "devDependencies": {},
   "scripts": {
     "test": "npx vbspm test\\test.vbs && test\\test.cmd",
     "build": "builder.cmd"

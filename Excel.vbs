@@ -41,6 +41,10 @@ Class Excel
         Set GetActiveWorkbook = ActiveWorkbook
     End Property
 
+    Public Property Get GetApplication
+        Set GetApplication = Application
+    End Property
+
     Private Application
     Private ActiveWorkbook
     Private wkbSource
@@ -226,39 +230,6 @@ Class Excel
         if(save) Then wkbSource.save
     End Sub
 
-    Public Sub SimpleXYPlot(data, destination)
-    
-        If IsNull(destination) Or destination = "" Then
-            EchoX "Destination directory not provided. Will be uploaded to default direcotry %x", GetActiveWorkbook.Name
-            destination = putil.Resolve(GetActiveWorkbook.Name)
-        End If
-
-        destination = objFSO.GetBaseName(destination)
-        destination = objFSO.BuildPath(putil.BasePath, destination)
-        If cFS.CreateFolder(destination) Then
-            EchoX "Destination Directory successfully created at: %x", destination
-        Else
-            EchoX "Unable to create destination directory at [%x]. Please create it and retry.", destination
-            Exit Sub
-        End If
-        destination = objFSO.BuildPath(destination, "SimpleXYPlot.png")
-
-        dim arr
-        arr = split(data, ",")
-        with Application.ActiveWorkbook.worksheets(1)
-            .usedrange.clear
-            .Range("A2").value = arr(0)
-            .Range("B2").value = arr(1)
-            .Range("A2").value = arr(2)
-            .Range("B2").value = arr(3)
-            .Range("A3").value = arr(4)
-            .Range("B3").value = arr(5)
-            .Range("A4").value = arr(6)
-            .Range("B4").value = arr(7)
-        end with
-        Application.Run "'" & ActiveWorkbook.Name & "'!PlotTheChart", "SimpleXY", destination, "Dark"  
-    End Sub
-
     Public Sub RunModuleMacro(macro) 
         Application.Run "'" & ActiveWorkbook.Name & "'!" & macro 
     End Sub
@@ -279,3 +250,46 @@ Class Excel
     End Sub
 
 End Class ' Excel
+
+Class ExcelPlotter extends Excel
+
+    Private objFSO
+
+    Private Sub Class_Initialize()
+        Set objFSO = CreateObject("scripting.filesystemobject")
+    End Sub
+    
+    Public Sub SimpleXYPlot(data, destination)
+    
+        If IsNull(destination) Or destination = "" Then
+            EchoX "Destination directory not provided. Will be uploaded to default direcotry %x", GetActiveWorkbook.Name
+            destination = putil.Resolve(GetActiveWorkbook.Name)
+        End If
+
+        destination = objFSO.GetBaseName(destination)
+        destination = objFSO.BuildPath(putil.BasePath, destination)
+        If cFS.CreateFolder(destination) Then
+            EchoX "Destination Directory successfully created at: %x", destination
+        Else
+            EchoX "Unable to create destination directory at [%x]. Please create it and retry.", destination
+            Exit Sub
+        End If
+        destination = objFSO.BuildPath(destination, "SimpleXYPlot.png")
+
+        dim arr
+        arr = split(data, ",")
+        with GetApplication.ActiveWorkbook.worksheets(1)
+            .usedrange.clear
+            .Range("A2").value = arr(0)
+            .Range("B2").value = arr(1)
+            .Range("A2").value = arr(2)
+            .Range("B2").value = arr(3)
+            .Range("A3").value = arr(4)
+            .Range("B3").value = arr(5)
+            .Range("A4").value = arr(6)
+            .Range("B4").value = arr(7)
+        end with
+        GetApplication.Run "'" & GetActiveWorkbook.Name & "'!PlotTheChart", "SimpleXY", destination, "Dark"  
+    End Sub
+
+End Class
