@@ -1,25 +1,32 @@
 {
-  "name": "vbs-excel-utilities",
-  "version": "1.0.8",
+  "name": "@vbsnext/vbs-excel-unpack",
+  "version": "1.0.9",
   "description": "Excel Unpacker and other excel utilities written in Vbscript  ",
-  "main": "index.js",
-  "directories": {
-    "test": "test"
-  },
+  "main": "builder.cmd",
   "bin": {
     "xlunpack": "vbs-excel-unpack.cmd",
-    "xlpack": "vbs-excel-pack.cmd",
-    "xlplotXY": "vbs-excel-plot-simple-xy.cmd"
+    "xlpack": "vbs-excel-pack.cmd"
   },
-  "dependencies": {
+  "dependencies": {},
+  "devDependencies": {
+    "@vbsnext/vbs-doc-gen": "^1.0.0",
     "@vbsnext/vbsnext-core": "^1.3.3"
   },
-  "devDependencies": {},
   "scripts": {
-    "test": "test.cmd",
-    "build": "builder.cmd"
+    "test": "test\\test.cmd",
+    "build": "builder.cmd",
+    "docs": "npx vbs-doc-gen /source:\".\\lib\" /destination:\".\\docs\""
   },
-  "keywords": [],
-  "author": "Praveen Kumar Nandagiri <pravynandas@gmail.com>",
+  "keywords": [
+    "Excel macro unpack",
+    "Excel macro pack",
+    "Excel Version control",
+    "Excel export vba",
+    "Vbs vbscript Excel unpacker"
+  ],
+  "author": {
+    "name": "Praveen Kumar Nandagiri",
+    "email": "pravynandas@gmail.com"
+  },
   "license": "ISC"
 }

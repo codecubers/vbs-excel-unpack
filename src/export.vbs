@@ -1,5 +1,5 @@
 Include(".\parameters.vbs")
-Include("..\Excel.vbs")
+Include(".\Excel.vbs")
 Dim xl
 set xl = new Excel
 EchoX "Opening workbook at path: %x", wbFile

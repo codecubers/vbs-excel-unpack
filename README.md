@@ -1,11 +1,11 @@
-# vbs-excel-utilities
-Excel Unpacker and other excel utilities written in Vbscript
+# vbs-excel-unpack
+Excel Unpacker and re-packer utility
 
 
 ## Installation
 
 ```sh
-npm i vbs-excel-utilities
+npm i @vbsnext/vbs-excel-unpack
 ```
 
 ## Usage
